@@ -35,7 +35,7 @@ def login():
         username = request.form['username']
         password = request.form['password']
         # Hardcoded login — can move to .env later
-        if username == 'admin' and password == 'admin123':
+        if username == 'admin' and password == 'Admin123':
             session['logged_in'] = True
             return redirect(url_for('dashboard'))
         else:
