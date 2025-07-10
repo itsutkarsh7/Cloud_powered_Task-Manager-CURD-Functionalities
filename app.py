@@ -1,10 +1,12 @@
 from flask import Flask, render_template, request, redirect, url_for, session, flash
 from cloudant.client import Cloudant
 from config import cloudant_config
+import os
 
 app = Flask(__name__)
-app.secret_key = 'your-secret-key'
+app.secret_key = 'super-secret-key'  # Replace with something stronger in production
 
+# Cloudant client (IAM Auth using API Key from environment)
 client = Cloudant.iam(
     cloudant_config["username"],
     cloudant_config["apikey"],
@@ -13,6 +15,10 @@ client = Cloudant.iam(
 )
 
 db = client.create_database(cloudant_config["dbname"], throw_on_exists=False)
+
+# ------------------------
+# ROUTES
+# ------------------------
 
 @app.route('/')
 def home():
@@ -26,11 +32,15 @@ def landing():
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
-        if request.form['username'] == 'admin' and request.form['password'] == 'admin123':
+        username = request.form['username']
+        password = request.form['password']
+        # Hardcoded login — can move to .env later
+        if username == 'admin' and password == 'admin123':
             session['logged_in'] = True
             return redirect(url_for('dashboard'))
         else:
-            flash('Invalid credentials')
+            flash('Invalid credentials', 'danger')
+            return redirect(url_for('login'))
     return render_template('login.html')
 
 @app.route('/logout')
