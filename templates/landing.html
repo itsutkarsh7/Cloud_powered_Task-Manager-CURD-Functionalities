@@ -1,32 +1,43 @@
 {% extends "base.html" %}
 {% block content %}
 
-<!-- Hero Section -->
-<section class="py-5 text-center bg-dark text-white">
-  <div class="container">
-    <h1 class="display-4">Welcome to Cloud Powered Task Manager 🌥️</h1>
-    <p class="lead mb-4">Manage your tasks anytime, anywhere — securely stored in the cloud.</p>
+<!-- 🌟 Hero Section -->
+<section class="py-5 bg-dark text-white">
+  <div class="container text-center">
+    <h1 class="display-4 fw-bold mb-3">Cloud Powered Task Manager</h1>
+    <p class="lead mb-4">
+      Manage your tasks with speed, simplicity, and the power of the cloud.  
+      Track your progress anytime, anywhere.
+    </p>
     <a href="{{ url_for('home') }}" class="btn btn-outline-light btn-lg">Go to Dashboard</a>
   </div>
 </section>
 
-<!-- Recent Tasks Section -->
+<!-- 📋 Recent Tasks in Cards -->
 <section class="bg-light py-5">
   <div class="container">
-    <h3 class="text-center mb-4 text-dark">📝 Recent Tasks</h3>
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <h3 class="text-dark">📝 Recent Tasks</h3>
+      <a href="{{ url_for('home') }}" class="btn btn-primary">Open Full Dashboard</a>
+    </div>
 
     {% if tasks and tasks|length > 0 %}
       <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
         {% for task in tasks[:6] %}
           <div class="col">
             <div class="card h-100 border-0 shadow-sm">
-              <div class="card-body">
-                <h5 class="card-title text-primary">{{ task['title'] }}</h5>
-                <p class="card-text">
-                  <span class="badge bg-{{ 'success' if task['done'] else 'warning' }}">
-                    {{ '✅ Done' if task['done'] else '⏳ Pending' }}
-                  </span>
-                </p>
+              <div class="card-body d-flex justify-content-between align-items-start flex-column">
+                <div class="w-100 mb-3">
+                  <h5 class="card-title text-primary">{{ task['title'] }}</h5>
+                  <p>
+                    <span class="badge bg-{{ 'success' if task['done'] else 'warning' }}">
+                      {{ '✅ Done' if task['done'] else '⏳ Pending' }}
+                    </span>
+                  </p>
+                </div>
+                <div class="w-100 d-flex justify-content-end">
+                  <a href="{{ url_for('edit_task', id=task['_id']) }}" class="btn btn-outline-secondary btn-sm">Edit</a>
+                </div>
               </div>
             </div>
           </div>
