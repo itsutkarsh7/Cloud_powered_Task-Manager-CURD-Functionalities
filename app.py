@@ -3,6 +3,7 @@ from cloudant.client import Cloudant
 from config import cloudant_config
 
 app = Flask(__name__)
+app.secret_key = 'your-secret-key'
 
 # Connect to Cloudant
 client = Cloudant.iam(
@@ -11,15 +12,19 @@ client = Cloudant.iam(
     url=cloudant_config["url"],
     connect=True
 )
-
 db = client.create_database(cloudant_config["dbname"], throw_on_exists=False)
 
-
+# ✅ Landing Page Route
 @app.route('/')
+def landing():
+    tasks = [doc for doc in db]
+    return render_template('landing.html', tasks=tasks)
+
+# ✅ Dashboard
+@app.route('/dashboard')
 def home():
     tasks = [doc for doc in db]
     return render_template('index.html', tasks=tasks)
-
 
 @app.route('/add', methods=['GET', 'POST'])
 def add_task():
@@ -30,7 +35,6 @@ def add_task():
         db.create_document({"title": title, "done": False})
         return redirect(url_for('home'))
     return render_template('add.html')
-
 
 @app.route('/edit/<id>', methods=['GET', 'POST'])
 def edit_task(id):
@@ -43,13 +47,11 @@ def edit_task(id):
         return redirect(url_for('home'))
     return render_template('edit.html', task=doc)
 
-
 @app.route('/delete/<id>')
 def delete_task(id):
     if id in db:
         db[id].delete()
     return redirect(url_for('home'))
-
 
 @app.route('/done/<id>')
 def mark_done(id):
@@ -59,7 +61,6 @@ def mark_done(id):
         doc.save()
     return redirect(url_for('home'))
 
-
 @app.route('/pending/<id>')
 def mark_pending(id):
     if id in db:
@@ -67,7 +68,6 @@ def mark_pending(id):
         doc['done'] = False
         doc.save()
     return redirect(url_for('home'))
-
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=10000)

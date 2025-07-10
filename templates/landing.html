@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block content %}
+
+<section class="py-5 text-center">
+    <div class="container">
+        <h1 class="display-4 text-primary">Welcome to Cloud Powered Task Manager 🌥️</h1>
+        <p class="lead text-muted mb-4">Manage tasks anywhere, anytime — stored securely in the cloud.</p>
+        <a href="{{ url_for('home') }}" class="btn btn-primary btn-lg">Go to Dashboard</a>
+    </div>
+</section>
+
+<section class="bg-light py-4">
+    <div class="container">
+        <h3 class="text-center mb-4 text-secondary">📝 Recent Tasks</h3>
+        {% if tasks and tasks|length > 0 %}
+            <ul class="list-group">
+                {% for task in tasks[:5] %}
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        {{ task['title'] }}
+                        <span class="badge bg-{{ 'success' if task['done'] else 'warning' }}">
+                            {{ 'Done' if task['done'] else 'Pending' }}
+                        </span>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p class="text-center text-muted">No tasks yet. Start by adding one.</p>
+        {% endif %}
+    </div>
+</section>
+
+{% endblock %}
