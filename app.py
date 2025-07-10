@@ -4,9 +4,13 @@ from config import cloudant_config
 import os
 
 app = Flask(__name__)
-app.secret_key = 'super-secret-key'  # Replace with something stronger in production
+app.secret_key = 'super-secret-key'  # Replace with something secure
 
-# Cloudant client (IAM Auth using API Key from environment)
+# Read login credentials from environment variables
+LOGIN_USER = os.getenv('LOGIN_USER', 'admin')
+LOGIN_PASS = os.getenv('LOGIN_PASS', 'admin123')
+
+# Cloudant connection using IAM API key
 client = Cloudant.iam(
     cloudant_config["username"],
     cloudant_config["apikey"],
@@ -14,6 +18,7 @@ client = Cloudant.iam(
     connect=True
 )
 
+# Create or get database
 db = client.create_database(cloudant_config["dbname"], throw_on_exists=False)
 
 # ------------------------
@@ -34,13 +39,18 @@ def login():
     if request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
-        # Hardcoded login — can move to .env later
-        if username == 'admin' and password == 'Admin123':
+
+        # 🔍 Debug: Print actual and expected credentials
+        print("🛠️ Received credentials:", username, password)
+        print("✅ Expected credentials:", LOGIN_USER, LOGIN_PASS)
+
+        if username == LOGIN_USER and password == LOGIN_PASS:
             session['logged_in'] = True
             return redirect(url_for('dashboard'))
         else:
             flash('Invalid credentials', 'danger')
             return redirect(url_for('login'))
+
     return render_template('login.html')
 
 @app.route('/logout')
@@ -107,6 +117,10 @@ def mark_pending(id):
         doc['done'] = False
         doc.save()
     return redirect(url_for('dashboard'))
+
+# ------------------------
+# RUN LOCAL
+# ------------------------
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=10000)
