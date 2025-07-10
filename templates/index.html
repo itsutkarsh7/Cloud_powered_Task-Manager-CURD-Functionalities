@@ -1,36 +1,45 @@
 {% extends "base.html" %}
 {% block content %}
-<h2 class="mb-4">All Tasks</h2>
-<table class="table table-bordered table-striped">
-    <thead class="table-dark">
-        <tr>
-            <th>Title</th>
-            <th>Status</th>
-            <th>Actions</th>
-        </tr>
-    </thead>
-    <tbody>
+
+<div class="text-center mb-4">
+    <h2 class="text-primary">📋 Your Task Dashboard</h2>
+</div>
+
+<div class="mb-4 text-end">
+    <a href="{{ url_for('add_task') }}" class="btn btn-success">+ Add New Task</a>
+</div>
+
+{% if tasks and tasks|length > 0 %}
+  <div class="row">
     {% for task in tasks %}
-        <tr>
-            <td>{{ task['title'] }}</td>
-            <td>
-                {% if task['done'] %}
-                    <span class="badge bg-success">Done</span>
-                {% else %}
-                    <span class="badge bg-warning text-dark">Pending</span>
-                {% endif %}
-            </td>
-            <td>
-                <a href="{{ url_for('edit_task', id=task['_id']) }}" class="btn btn-sm btn-primary">Edit</a>
-                <a href="{{ url_for('delete_task', id=task['_id']) }}" class="btn btn-sm btn-danger">Delete</a>
-                {% if not task['done'] %}
-                    <a href="{{ url_for('mark_done', id=task['_id']) }}" class="btn btn-sm btn-success">Mark Done</a>
-                {% else %}
-                    <a href="{{ url_for('mark_pending', id=task['_id']) }}" class="btn btn-sm btn-secondary">Mark Pending</a>
-                {% endif %}
-            </td>
-        </tr>
+      <div class="col-md-4 mb-4">
+        <div class="card shadow-sm h-100">
+          <div class="card-body">
+            <h5 class="card-title">{{ task['title'] }}</h5>
+            <p>
+              <span class="badge bg-{{ 'success' if task['done'] else 'warning' }}">
+                {{ '✅ Done' if task['done'] else '⏳ Pending' }}
+              </span>
+            </p>
+
+            <div class="d-flex flex-wrap gap-2">
+              {% if not task['done'] %}
+                <a href="{{ url_for('mark_done', id=task['_id']) }}" class="btn btn-sm btn-success">Mark Done ✅</a>
+              {% else %}
+                <a href="{{ url_for('mark_pending', id=task['_id']) }}" class="btn btn-sm btn-warning">Mark Pending ⏳</a>
+              {% endif %}
+              <a href="{{ url_for('edit_task', id=task['_id']) }}" class="btn btn-sm btn-secondary">Edit ✏️</a>
+              <a href="{{ url_for('delete_task', id=task['_id']) }}" class="btn btn-sm btn-danger">Delete ❌</a>
+            </div>
+          </div>
+        </div>
+      </div>
     {% endfor %}
-    </tbody>
-</table>
+  </div>
+{% else %}
+  <div class="alert alert-info text-center">
+    No tasks found. Use the "Add New Task" button to create one!
+  </div>
+{% endif %}
+
 {% endblock %}

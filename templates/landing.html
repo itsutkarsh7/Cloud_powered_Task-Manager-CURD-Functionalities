@@ -2,30 +2,47 @@
 {% block content %}
 
 <section class="py-5 text-center">
-  <h2 class="mb-3">Welcome to Cloud Powered Task Manager</h2>
-  <p class="text-muted">Track your progress with style 🚀</p>
-  <h5 class="mb-4">
-    <span class="badge bg-warning text-dark me-2">⏳ Pending: {{ tasks | selectattr('done', 'equalto', False) | list | length }}</span>
-    <span class="badge bg-success">✅ Done: {{ tasks | selectattr('done', 'equalto', True) | list | length }}</span>
-  </h5>
-  <a href="{{ url_for('login') }}" class="btn btn-primary">Login to Dashboard</a>
+  <div class="container">
+    <h1 class="mb-3">Welcome to Cloud Powered Task Manager</h1>
+    <p class="text-muted">Efficiently manage and preview your tasks, powered by the cloud ☁️</p>
+    
+    <h5 class="my-4">
+      <span class="badge bg-warning text-dark me-2">
+        ⏳ Pending: {{ tasks | selectattr('done', 'equalto', False) | list | length }}
+      </span>
+      <span class="badge bg-success">
+        ✅ Done: {{ tasks | selectattr('done', 'equalto', True) | list | length }}
+      </span>
+    </h5>
+
+    <a href="{{ url_for('login') }}" class="btn btn-primary btn-lg">Login to Dashboard</a>
+  </div>
 </section>
 
-<section class="container py-4">
-  <h4 class="mb-4">📋 Recent Tasks</h4>
-  <div class="row">
-    {% for task in tasks[:6] %}
-      <div class="col-md-4 mb-4">
-        <div class="card shadow-sm">
-          <div class="card-body">
-            <h5 class="card-title">{{ task['title'] }}</h5>
-            <span class="badge bg-{{ 'success' if task['done'] else 'warning' }}">
-              {{ '✅ Done' if task['done'] else '⏳ Pending' }}
-            </span>
+<section class="py-5 bg-light">
+  <div class="container">
+    <h3 class="mb-4 text-start">📋 Recent Tasks</h3>
+
+    {% if tasks and tasks|length > 0 %}
+      <div class="row">
+        {% for task in tasks[:6] %}
+          <div class="col-md-4 mb-4">
+            <div class="card shadow-sm h-100">
+              <div class="card-body">
+                <h5 class="card-title">{{ task['title'] }}</h5>
+                <p>
+                  <span class="badge bg-{{ 'success' if task['done'] else 'warning' }}">
+                    {{ '✅ Done' if task['done'] else '⏳ Pending' }}
+                  </span>
+                </p>
+              </div>
+            </div>
           </div>
-        </div>
+        {% endfor %}
       </div>
-    {% endfor %}
+    {% else %}
+      <p class="text-muted">No tasks to display yet. Login to add your first one.</p>
+    {% endif %}
   </div>
 </section>
 

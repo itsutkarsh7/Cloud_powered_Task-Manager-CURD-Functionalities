@@ -14,13 +14,15 @@ client = Cloudant.iam(
 
 db = client.create_database(cloudant_config["dbname"], throw_on_exists=False)
 
-# 🔓 Public Landing Page
+@app.route('/')
+def home():
+    return redirect(url_for('landing'))
+
 @app.route('/landing')
 def landing():
     tasks = [doc for doc in db]
     return render_template('landing.html', tasks=tasks)
 
-# 🔐 Login
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
@@ -31,13 +33,11 @@ def login():
             flash('Invalid credentials')
     return render_template('login.html')
 
-# 🚪 Logout
 @app.route('/logout')
 def logout():
     session.clear()
     return redirect(url_for('landing'))
 
-# ✅ Dashboard (Protected)
 @app.route('/dashboard')
 def dashboard():
     if not session.get('logged_in'):
