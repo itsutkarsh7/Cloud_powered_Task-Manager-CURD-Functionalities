@@ -1,29 +1,24 @@
 from flask import Flask, render_template, request, redirect, url_for, session, flash
 from cloudant.client import Cloudant
 from config import cloudant_config
-import os
 
 app = Flask(__name__)
-app.secret_key = 'super-secret-key'  # Replace with something secure
+app.secret_key = 'super-secret-key'  # use a more secure key in production
 
-# Read login credentials from environment variables
-LOGIN_USER = os.getenv('LOGIN_USER', 'admin')
-LOGIN_PASS = os.getenv('LOGIN_PASS', 'admin123')
+# ✅ Fixed credentials
+LOGIN_USER = 'admin'
+LOGIN_PASS = '123456'
 
-# Cloudant connection using IAM API key
+# ✅ Connect to Cloudant
 client = Cloudant.iam(
     cloudant_config["username"],
     cloudant_config["apikey"],
     url=cloudant_config["url"],
     connect=True
 )
-
-# Create or get database
 db = client.create_database(cloudant_config["dbname"], throw_on_exists=False)
 
-# ------------------------
-# ROUTES
-# ------------------------
+# ----------------- ROUTES -----------------
 
 @app.route('/')
 def home():
@@ -37,12 +32,10 @@ def landing():
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
-        username = request.form['username']
-        password = request.form['password']
+        username = request.form['username'].strip()
+        password = request.form['password'].strip()
 
-        # 🔍 Debug: Print actual and expected credentials
-        print("🛠️ Received credentials:", username, password)
-        print("✅ Expected credentials:", LOGIN_USER, LOGIN_PASS)
+        print("🔐 Login attempt:", repr(username), repr(password))
 
         if username == LOGIN_USER and password == LOGIN_PASS:
             session['logged_in'] = True
@@ -118,9 +111,6 @@ def mark_pending(id):
         doc.save()
     return redirect(url_for('dashboard'))
 
-# ------------------------
-# RUN LOCAL
-# ------------------------
-
+# ----------------- APP RUN -----------------
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=10000)
