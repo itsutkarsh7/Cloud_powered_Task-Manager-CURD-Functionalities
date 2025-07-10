@@ -1,44 +1,36 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Task Manager Dashboard</title>
-    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-</head>
-<body class="bg-gray-100 font-sans">
-
-    <div class="container mx-auto p-6">
-        <h1 class="text-3xl font-bold mb-6 text-center text-blue-600">🌟 Cloud Task Manager</h1>
-
-        <div class="flex justify-center mb-6">
-            <a href="/add" class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 transition">+ Add New Task</a>
-        </div>
-
-        {% if tasks %}
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {% for task in tasks %}
-                    <div class="bg-white p-4 rounded shadow hover:shadow-lg transition">
-                        <h2 class="text-xl font-semibold mb-2">{{ task['title'] }}</h2>
-                        <p class="mb-4">
-                            <span class="px-2 py-1 rounded {{ 'bg-green-200 text-green-800' if task['done'] else 'bg-yellow-200 text-yellow-800' }}">
-                                {{ "Done ✅" if task['done'] else "Pending ⏳" }}
-                            </span>
-                        </p>
-                        <div class="flex flex-wrap gap-2">
-                            {% if not task['done'] %}
-                                <a href="/done/{{ task['_id'] }}" class="bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600 transition">Mark Done ✅</a>
-                            {% else %}
-                                <a href="/pending/{{ task['_id'] }}" class="bg-yellow-500 text-white px-3 py-1 rounded hover:bg-yellow-600 transition">Mark Pending ⏳</a>
-                            {% endif %}
-                            <a href="/edit/{{ task['_id'] }}" class="bg-gray-500 text-white px-3 py-1 rounded hover:bg-gray-600 transition">Edit</a>
-                            <a href="/delete/{{ task['_id'] }}" class="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600 transition">Delete</a>
-                        </div>
-                    </div>
-                {% endfor %}
-            </div>
-        {% else %}
-            <p class="text-center text-gray-600">No tasks yet! Click "Add New Task" to get started.</p>
-        {% endif %}
-    </div>
-
-</body>
-</html>
+{% extends "base.html" %}
+{% block content %}
+<h2 class="mb-4">All Tasks</h2>
+<table class="table table-bordered table-striped">
+    <thead class="table-dark">
+        <tr>
+            <th>Title</th>
+            <th>Status</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+    {% for task in tasks %}
+        <tr>
+            <td>{{ task['title'] }}</td>
+            <td>
+                {% if task['done'] %}
+                    <span class="badge bg-success">Done</span>
+                {% else %}
+                    <span class="badge bg-warning text-dark">Pending</span>
+                {% endif %}
+            </td>
+            <td>
+                <a href="{{ url_for('edit_task', id=task['_id']) }}" class="btn btn-sm btn-primary">Edit</a>
+                <a href="{{ url_for('delete_task', id=task['_id']) }}" class="btn btn-sm btn-danger">Delete</a>
+                {% if not task['done'] %}
+                    <a href="{{ url_for('mark_done', id=task['_id']) }}" class="btn btn-sm btn-success">Mark Done</a>
+                {% else %}
+                    <a href="{{ url_for('mark_pending', id=task['_id']) }}" class="btn btn-sm btn-secondary">Mark Pending</a>
+                {% endif %}
+            </td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>
+{% endblock %}
